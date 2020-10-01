@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2020-10-01T10:35:29.544Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36" etag="MNmCHSJp7wi4V6bzClIB" version="13.7.7" type="github">
-  <diagram id="g1xtXuFp_eHexRMVPpP3" name="Page-1">
-    <mxGraphModel dx="7650" dy="3108" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+<mxfile host="app.diagrams.net" modified="2020-10-01T11:09:38.448Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36" etag="ckabhj4FNM04I5bxS-gG" version="13.7.7" type="github" pages="3">
+  <diagram id="g1xtXuFp_eHexRMVPpP3" name="NicorLPackges">
+    <mxGraphModel dx="3980" dy="777" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -106,15 +106,50 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_Fx6LXxLv8wZhsZlMmkG-13" target="_Fx6LXxLv8wZhsZlMmkG-15">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="_Fx6LXxLv8wZhsZlMmkG-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-1240" y="700" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
         <mxCell id="_Fx6LXxLv8wZhsZlMmkG-13" value="NICOR Project specific functions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="-1130" y="354" width="180" height="60" as="geometry" />
+          <mxGeometry x="-1030" y="490" width="180" height="60" as="geometry" />
         </mxCell>
-        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-15" value="ReadProject Data&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
-          <mxGeometry x="-1530" y="630" width="40" height="20" as="geometry" />
+        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-22" value="Code :&amp;nbsp;&lt;span&gt;function (project, file, ..., encoding = as.character(NicorList$charEncodings)[-1],&amp;nbsp;&lt;/span&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; dictionary = NicorList$dictionary, on = Sys.time(), format.map = NicorList$format.map,&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; use.date.range = TRUE)&amp;nbsp;&lt;/div&gt;&lt;div&gt;{&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; metadata &amp;lt;- NicorList$selectedProjectMetadata2&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.data.file &amp;lt;- file&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.encoding &amp;lt;- encoding&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; if (length(encoding) &amp;gt; 1 || !(encoding %in% iconvlist()))&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; m.encoding &amp;lt;- checkFileEncoding(file = m.data.file, encodings = encoding)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.fields &amp;lt;- unlist(read.csv(m.data.file, nrows = 1, header = FALSE,&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; na.strings = &quot;&quot;, fileEncoding = m.encoding))&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.fields_no_whitespace &amp;lt;- sub(&quot;\\s+$&quot;, &quot;&quot;, m.fields)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.data &amp;lt;- read.csv(m.data.file, nrows = 2, header = TRUE,&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; na.strings = &quot;&quot;, fileEncoding = m.encoding)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; if (!identical(m.fields, m.fields_no_whitespace)) {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; eee &amp;lt;- which(!(m.fields %in% m.fields_no_whitespace))&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; names(m.data)[eee] &amp;lt;- sub(&quot;\\.+$&quot;, &quot;&quot;, names(m.data)[eee])&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.data &amp;lt;- fixFieldNames(project = project, data = m.data,&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; dictionary = dictionary)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; eval(metadataSelectParameters)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.formats &amp;lt;- metadata$field$format[match(names(m.data), metadata$field$rName)]&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; levels(m.formats) &amp;lt;- c(levels(m.formats), &quot;character&quot;, &quot;factor&quot;,&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &quot;integer&quot;, &quot;numeric&quot;, &quot;date&quot;, format.map[[2]])&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; for (i in 1:length(format.map[[1]])) m.formats &amp;lt;- replace(m.formats,&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; !is.na(match(m.formats, format.map[[1]][i])), format.map[[2]][i])&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; m.data &amp;lt;- read.csv(m.data.file, colClasses = as.character(m.formats),&amp;nbsp;&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; header = TRUE, na.strings = &quot;&quot;, fileEncoding = m.encoding)&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; if (!identical(m.fields, m.fields_no_whitespace)) {&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; eee &amp;lt;- which(!(m.fields %in% m.fields_no_whitespace))&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; names(m.data)[eee] &amp;lt;- sub(&quot;\\.+$&quot;, &quot;&quot;, names(m.data)[eee])&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; }&lt;/div&gt;&lt;div&gt;&amp;nbsp; &amp;nbsp; return(invisible(m.data))&lt;/div&gt;&lt;div&gt;}&lt;/div&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-1920" y="850" width="780" height="510" as="geometry" />
         </mxCell>
+        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-23" value="RCode&amp;nbsp;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="650" y="290" width="40" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-27" value="ReadProjectData" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fillColor=#FFFFFF;" vertex="1" parent="1">
+          <mxGeometry x="-1240" y="710" width="410" height="370" as="geometry">
+            <mxRectangle x="-260" y="910" width="110" height="26" as="alternateBounds" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-28" value="+ field: function to convert int facotor  CCAD ?" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="_Fx6LXxLv8wZhsZlMmkG-27">
+          <mxGeometry y="26" width="410" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-29" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;" vertex="1" parent="_Fx6LXxLv8wZhsZlMmkG-27">
+          <mxGeometry y="52" width="410" height="8" as="geometry" />
+        </mxCell>
+        <mxCell id="_Fx6LXxLv8wZhsZlMmkG-30" value="function (..., recursive = FALSE) &#xa;{&#xa;    ddd &lt;- as(unlist(c(sapply(list(...), function(X) {&#xa;        as(X, &quot;character&quot;)&#xa;    }))), &quot;multiFactorCcad&quot;)&#xa;    ddd@quality &lt;- unlist(c(sapply(list(...), function(X) {&#xa;        if (&quot;multiFactorCcad&quot; %in% class(X)) return(X@quality) else return(ifelse(is.na(X), &#xa;            -1, 1))&#xa;    })))&#xa;    lll_original &lt;- unique(unlist(c(sapply(list(...), function(X) {&#xa;        levels(X)&#xa;    }))))&#xa;    levels(ddd) &lt;- (c(levels(ddd), lll_original[!(lll_original %in% &#xa;        levels(ddd))]))&#xa;    return(ddd)&#xa;}" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="_Fx6LXxLv8wZhsZlMmkG-27">
+          <mxGeometry y="60" width="410" height="310" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="zQ6nagGOj-5dPxaUeyW0" name="SlIdeDeck">
+    <mxGraphModel dx="1499" dy="777" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="OibMk0mDw9Ql79LyrCwj-0" />
+        <mxCell id="OibMk0mDw9Ql79LyrCwj-1" parent="OibMk0mDw9Ql79LyrCwj-0" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="MbtRf8MS6VoD2VGpcoW7" name="COP">
+    <mxGraphModel dx="1499" dy="777" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="MY_t3JgvO_nrN-s2fLFw-0" />
+        <mxCell id="MY_t3JgvO_nrN-s2fLFw-1" parent="MY_t3JgvO_nrN-s2fLFw-0" />
       </root>
     </mxGraphModel>
   </diagram>
