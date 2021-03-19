@@ -1,0 +1,388 @@
+
+Read the dataset
+```{r}
+
+library(xlsx)
+library(dplyr)
+library(naniar)
+library(plyr)
+library(mice)
+library(car)
+library(tidyr)
+library(MASS)
+
+data_<-read.xlsx("Case Study for Candidates- Senior BI Analyst.xlsx",sheetIndex = 2)
+
+original<-read.xlsx("Case Study for Candidates- Senior BI Analyst.xlsx",sheetIndex = 2)
+```
+
+
+Goal : Which Patients are likely to develop heart disease :
+
+```{r}
+
+colnames(data_)
+library(Hmisc)
+
+## Do some summary for each variables , mean , min , max , tabled values 
+
+Hmisc::describe(data_)
+
+
+
+```
+
+
+Outlier Detection
+
+```{r}
+
+
+library(purrr)
+library(tidyr)
+library(ggplot2)
+library(ggthemes)
+
+data_ %>%
+  keep(is.numeric) %>% 
+  gather() %>% 
+  ggplot(aes(value)) +
+    facet_wrap(~ key, scales = "free") +
+    geom_histogram()+theme_gdocs()+ggsave("numericalplot.png")
+
+
+
+
+```
+
+
+
+Initial Cleaning of the dataset
+```{r}
+## Discard inpermissible values or replace with NA: 
+
+
+#Filter excluded dataset
+data_4<-data_%>%filter(!dataset=="Please exclude from analysis")%>%
+      
+      #Blood Pressure
+      mutate(systbps=replace(systbps,systbps==0,NA))%>%
+
+      # MAx HR
+      mutate(maxhr=replace(maxhr,maxhr>205,NA))%>%
+
+      # Exclude Male /Female :
+      filter(!gender %in% c("Binary","Unknown"))
+
+
+print(paste("Rows excluded after cleaning ", nrow(data_)-nrow(data_4)))
+
+```
+
+Missingess in the dataset :
+
+
+```{r}
+vis_miss(data_4)
+
+#Seperate Datasets
+BHf<-data_4%>%filter(dataset=="BHF")
+CC<-data_4%>%filter(dataset=="Cleveland Clnic London")
+
+vis_miss(BHf)
+vis_miss(CC)
+```
+Missingness in the dataset
+
+```{r}
+gg_miss_upset(data_4)
+
+# discard rows which have all 4 variables with NA 
+
+
+NA_data<-data_4%>%dplyr::select(maxhr,oldpeak,fbs,slope,ca)%>%dplyr::mutate(NA_Most=rowSums(is.na(.)))
+
+data_5<-data_4[which(NA_data$NA_Most!=4,),]
+
+data_5$chol<-as.factor(data_5$chol)
+data_5$ca<-as.factor(data_5$ca)
+
+
+
+```
+
+Some tests for imputations
+
+```{r}
+BHF_imputed<-imputed%>%filter(dataset=="BHF")
+
+CC_imputed<-imputed%>%filter(dataset=="Cleveland Clnic London")
+
+
+par(mfrow=c(1,2))
+hist(BHF_imputed$age)
+hist(CC_imputed$age)
+```
+
+
+Transformig Data
+```{r}
+
+bin_age<-function(age=""){
+  
+  age<-  case_when(
+    age >= 20  & age <= 39 ~ '20-39',
+    age >= 40  & age <= 49 ~ '40-49',
+     age >= 50  & age <= 59 ~ '50-59',
+     age >= 60  & age <= 69 ~ '60-69',
+      age >= 70  & age <= 79 ~ '70-79',
+    age >= 80  & age <= 89 ~ '80-89',
+    )
+  
+return(age)
+  
+}
+  
+
+
+transform_data<-function(data_=""){
+  
+  # Creatae a BMI Variable
+ 
+  data_$dataset<-NULL
+  #Bin Age
+  data_$age<-bin_age(data_["age"])
+  data_$age<-as.factor(data_$age)
+# Blood Pressure
+  #data_$systbps<-ifelse(data_$systbps>140,"High BP","Not High BP")
+ # data_$systbps<-as.factor(data_$systbps)
+  ""#Cholestrol
+ # data_$chol<-ifelse(data_$chol!=5,"High Chol","No Chol")
+  #data_$chol<-as.factor(data_$chol)
+  #BMI Calculated
+  data_$BMI<-data_$Weight/((0.01*data_$Hgt)^2)
+
+  data_$Hgt<-NULL
+  data_$Weight<-NULL
+  
+  data_$fbs<-as.factor(data_$fbs)
+  
+  return(data_)
+}
+
+
+
+# remove variables with more than 
+
+imputed_transfomred<-transform_data(imputed)
+transformed_data<-transform_data(data_4)
+
+```
+
+
+build a artificial response variable
+
+```{r}
+
+transform_diagnostic_tests<-function(data_=""){
+  
+  data_$Abnormal_ECG<-ifelse(data_$ecgrst %in% c("lv hypertrophy","st-t abnormality"),TRUE,FALSE)
+  data_$ecgrst<-NULL
+  # Create a new predictor
+
+  
+ data_<- data_%>%mutate(CVD=case_when(Abnormal_ECG==TRUE & angex==TRUE~1,
+                                      Abnormal_ECG==FALSE & angex==TRUE |Abnormal_ECG==TRUE & angex==FALSE ~0,
+                                      Abnormal_ECG==FALSE & angex==FALSE~0
+                                      
+                                      
+                                      ))
+  
+ data_$Abnormal_ECG<-NULL
+ data_$angex<-NULL
+ data_$CVD<-as.factor(data_$CVD)
+  return(data_)
+    
+}
+
+imputed_transfomred_response<-transform_diagnostic_tests(imputed_transfomred)
+
+
+```
+Modelling: Logistic Regression/Multinomial Regression
+
+
+
+
+## Fit same modles on multiple datasets
+```{r}
+
+## Multiple datasets
+complete_cases_dataset<-data_5[complete.cases(data_5),]
+
+
+## Exclude Highmissingness variables and include others only for imputation
+highmissingess_removed<-data_5
+highmissingess_removed[names(which(sapply(data_5, function(x)sum(is.na(x))/length(x)>0.5)))]<-NULL
+
+##Filter datasets for Age & Gender 
+
+
+datasets_to_explore=list("original data"=data_5,"Variable with high missingess removed"=highmissingess_removed,"complete rows only dataset"=complete_cases_dataset)
+
+# impute datasets
+
+
+
+
+imputation_<-function(data_=""){
+  print("Imputing using MICE")
+  
+  if(all(sapply(data_, function(x)sum(is.na(x))/length(x))==0)){
+    
+    print("No Missingness")
+    imputed=data_
+    
+  }
+  else{
+    init = mice(data_, maxit=0) 
+meth = init$method
+predM = init$predictorMatrix
+
+predM[,c("id","dataset")]=0
+
+
+#Skip for imputatuinn but use for prediction
+
+meth[c("age","gender","chol","chstpn","Weight","Hgt")]=""
+
+meth[colnames(data_)[!colnames(data_) %in% c("id","dataset","age","gender","chol","chstpn","fbs","ecgrst","angex","slope","ca","chstpn")]]="norm"     
+
+#Skip useless Varuables
+
+set.seed(100)
+imputed = mice(data_, method=meth, predictorMatrix=predM, m=5)
+## 
+
+
+# complee dataset
+imputed <- complete(imputed)
+    
+  }
+
+  
+  return(imputed)
+}
+
+build_model_return_modelsummary_auc_proc_top5_accuracy_vic<-function(data_="",model_to_fit="",original_data=original){
+  
+model_summary<-summary(model_to_fit)
+
+# Compute predicted probbailites :
+
+test_pred<-data_%>%dplyr::select(!CVD)
+test_pred$predictedrisk<-predict(model_to_fit,test_pred,type = "response")
+fitted.results <- ifelse(test_pred$predictedrisk > 0.5,1,0)
+misClasificError <- mean(fitted.results !=data_$CVD )
+print(paste('Accuracy',1-misClasificError))
+
+missclassification_error<-1-misClasificError
+## plot roc curve
+
+library(ROCR)
+pr <- prediction(fitted.results, data_$CVD)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot_prf<-plot(prf)
+
+rp <- performance(pr, measure = "prec", x.measure = "rec")
+plot_rp<-plot(rp)
+
+
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+
+vif_model<-vif(model_to_fit)
+
+top_5_patients<-test_pred%>%arrange(-predictedrisk)%>%top_n(5)%>%dplyr::select(id)
+
+top_5_patients<-left_join(top_5_patients,original_data,by="id")
+
+return(list("model_summary"=model_summary,"accuracy"=missclassification_error,"plot roc"=plot_prf,"recall-precision curve"=plot_rp,"auc score"=auc,"vif > 9 ? "=vif_model,"top 5 patients"=top_5_patients))
+  
+  
+
+
+}
+
+
+
+# Apply Transformations :
+
+l<-lapply(datasets_to_explore,function(x){
+  
+  #Do some imputations
+  imputed_dataset<-imputation_(x)
+  
+  #Do some transformations
+  transformed_imputed<-transform_data(imputed_dataset)
+  
+  #Do some transform to prodce response
+  final_data<-transform_diagnostic_tests(transformed_imputed)
+  
+     # Fit models
+  if(any(colnames(final_data)%in% "ca")){
+    
+    model1<-  glm(CVD ~systbps+chol+fbs+maxhr+oldpeak+slope+ca+chstpn+BMI ,data = final_data, family = binomial(link='logit'))
+
+  }else{
+    
+      model1<-glm(CVD ~systbps+chol+fbs+maxhr+oldpeak+slope+chstpn+BMI ,data = final_data, family = binomial(link='logit'))
+
+  }
+  
+  #get results
+  build_model_return_modelsummary_auc_proc_top5_accuracy_vic(final_data,model1)
+  
+  
+})
+
+
+### Try with Age and Sex interatcions
+
+
+
+models_with_interaction<-lapply(datasets_to_explore,function(x){
+  
+  #Do some imputations
+  imputed_dataset<-imputation_(x)
+  
+  #Do some transformations
+  transformed_imputed<-transform_data(imputed_dataset)
+  
+  #Do some transform to prodce response
+  final_data<-transform_diagnostic_tests(transformed_imputed)
+  
+    # Fit models
+  if(any(colnames(final_data)%in% "ca")){
+    
+    model1<-  glm(CVD ~age*gender+systbps+chol+fbs+maxhr+oldpeak+slope+ca+chstpn+BMI ,data = final_data, family = binomial(link='logit'))
+
+  }else{
+    
+      model1<-glm(CVD ~age*gender+systbps+chol+fbs+maxhr+oldpeak+slope+chstpn+BMI ,data = final_data, family = binomial(link='logit'))
+
+  }
+
+  #get results
+  build_model_return_modelsummary_auc_proc_top5_accuracy_vic(final_data,model1)
+  
+  
+})
+
+
+
+
+```
+
+
+
